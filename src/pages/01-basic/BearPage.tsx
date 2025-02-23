@@ -1,5 +1,6 @@
 import { useBearStore } from '../../stores';
 import { BearItem } from './BearItem';
+import { Bears } from './Bears';
 
 export const BearPage = () => {
 
@@ -33,6 +34,8 @@ export const BearPage = () => {
           eventBears={ increasePandaBears } 
           title={ 'Osos pandas' } 
         /> 
+
+        <Bears />
 
       </div>
 
