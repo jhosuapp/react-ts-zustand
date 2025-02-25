@@ -1,10 +1,18 @@
-import { create } from 'zustand'
+import { create, StateCreator } from 'zustand'
+import { persist } from 'zustand/middleware';
 
 type BearIncrease = (by: number) => void;
 type BearCount = number;
 type Bears = {
     id: number;
     name: string;
+}
+
+interface Actions {
+    doNothing: () => void;
+    addBear: () => void;
+    clearBears: () => void;
+    totalBears: () => number
 }
 
 interface BearState {
@@ -17,27 +25,15 @@ interface BearState {
     increaseBlackBears: BearIncrease;
     increasePolarBears: BearIncrease;
     increasePandaBears: BearIncrease;
-    
-    doNothing: () => void;
-    addBear: () => void;
-    clearBears: () => void;
-
-    computed: {
-        totalBears: number
-    }
 }
 
-export const useBearStore = create<BearState>()((set, get) => ({
+const storeAPI: StateCreator<BearState & Actions> = (set, get) => ({
     bears: [{ id: 1, name: 'Bear #1' }],
     blackBears: 0,
     polarBears: 5,
     pandaBears: 10,
 
-    computed: {
-        get totalBears(){
-            return get().blackBears + get().polarBears + get().pandaBears + get().bears.length;
-        }
-    },
+    totalBears: ()=> ( get().blackBears + get().polarBears + get().pandaBears + get().bears.length ),
 
     increaseBlackBears: (by: number) => set(
         (state) => ({
@@ -69,4 +65,13 @@ export const useBearStore = create<BearState>()((set, get) => ({
             bears: []
         }
     )
-}));
+});
+
+export const useBearStore = create<BearState & Actions>()(
+    persist(
+        storeAPI,
+        {
+            name: 'bears-store'
+        }
+    )
+);
